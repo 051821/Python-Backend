@@ -1,0 +1,26 @@
+Fastapi
+Sqlalchemy
+Pydantic # For data validation and settings management
+Uvicorn  
+Alembic # For database migrations
+psycopg2-binary # PostgreSQL adapter for Python
+python-dotenv # For loading environment variables from a .env file
+pytest # For testing
+pytest-asyncio # For testing asynchronous code
+httpx # For making HTTP requests in tests
+pytest-cov # For measuring code coverage in tests
+pytest-mock # For mocking in tests
+black # For code formatting
+
+# for Authentication and Authorization
+passlib[bcrypt] # For password hashing
+python-jose[cryptography] # For JWT token handling
+python-multipart # For handling file uploads (if needed for authentication)\
+
+# For CORS handling
+fastapi-cors # For handling Cross-Origin Resource Sharing (CORS) in FastAPI applications
+model # For machine learning model handling (if needed)
+
+
+email-validator
+

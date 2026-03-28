@@ -1,0 +1,14 @@
+__pycache__/
+*.pyc
+
+venv/
+.env
+
+main.py   # ignore experimental file
+
+# Alembic (keep migrations, ignore cache)
+alembic/__pycache__/
+
+.vscode/
+.DS_Store
+*.log
