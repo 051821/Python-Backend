@@ -282,3 +282,207 @@ alembic downgrade -2 for rolling back 2 times and so on
 
 ##CORS handling - cross origin resource sharing
 
+
+Deploy on Horeku after pushing to github
+
+
+
+## for ubuntu setup
+connect ssh
+check for installed sudo apt update
+and python and pip version
+**sudo apt update**
+**sudo apt install python3.12-venv -y**
+
+**instal postgress : sudo apt update
+sudo apt install python3.12-venv -y**
+**sudo apt install postgresql postgresql-contrib -y**
+**$ sudo -u postgres psql**
+** cd /etc/postgresql/16/main**
+
+
+POSTGRESQL CONFIGURATION (ALLOW CONNECTIONS)
+
+Go to config folder
+cd /etc/postgresql/14/main
+
+
+---------------------------------
+1. Edit postgresql.conf
+
+Open file
+nano postgresql.conf
+
+Find this line:
+#listen_addresses = 'localhost'
+
+Change to:
+listen_addresses = '*'
+
+# This allows connections from any IP
+
+
+Save and exit:
+CTRL + X
+Y
+ENTER
+
+
+---------------------------------
+2. Edit pg_hba.conf
+
+Open file
+nano pg_hba.conf
+
+Find this line:
+local   all   postgres   peer
+
+Change to:
+local   all   postgres   trust
+
+![alt text](image-2.png)
+
+# peer  -> system user authentication
+# trust -> no password required (use carefully)
+
+OPTIONAL (for all users):
+local   all   all   trust
+
+
+Save and exit:
+CTRL + X
+Y
+ENTER
+
+
+---------------------------------
+3. Restart PostgreSQL
+
+sudo systemctl restart postgresql
+
+
+---------------------------------
+4. Now you can login easily
+
+psql -U postgres
+
+
+---------------------------------
+SECURITY NOTE
+
+trust = no password (only for local/dev use)
+For production, use:
+md5  (password-based authentication)
+
+
+---------------------------------
+ALTERNATIVE (Better Practice)
+
+Instead of 'trust', use:
+local   all   postgres   md5
+
+Then login:
+psql -U postgres -W
+# it will ask for password
+
+** now connect to pgadmin by creating a new server**
+**back to ubuntu in home make app directory mkdir name and do venv activate**
+virtualenv venv
+source venv/bin/activate
+anther source file directory.
+mkdir src
+cd src
+https://github.com/051821/Python-Backend.git . extra (.) so that it doesnot crete extra directory
+
+pip install -r requirements.txt
+uvicorn sqlalchmy.main2:app --reload    # run the server this will give validation error as we have not setup env variables
+uvicorn sqlalchmy.main2:app --reload
+
+setup env variables on linux
+export SECRET_KEY=1234 # for example
+printenv # for printing env variables
+unset SECRET_KEY # for removing env variable
+
+create env in home directory touch .env
+nano .env
+passall env variable in this file
+set -o allexport; source /home/anushka/.env; set +o allexport
+but when we reboot out linux system env will be deleted so to constraint it got to 
+$ nano .profile
+and add $ set -o allexport; source /home/anushka/.env; set +o allexport at the bottom of file
+**if want to chnage password of postgres on ubuntu go to conf.hba change md5 to trust and restart postgresql service Then login:
+psql -U postgres set passwrd with Alter user postgres with password 'passwrd'; and again restart and set trust to md5 **
+
+
+## in production environment we dont want to have alembic as we are not going to make any changes from there
+uvicorn --host 0.0.0.0 --port 8000 sqlalchmy.main2:app
+Edit → Virtual Network Editor → VMnet8 → NAT Settings → Port Forwarding
+🔹 SSH Port Forwarding (VMware NAT)
+Host Port: 2222
+VM IP: 192.168.241.131
+VM Port: 22
+
+Connect using:
+🔹 FastAPI Port Forwarding (VMware NAT)
+Host Port: 8000
+VM IP: 192.168.241.131
+VM Port: 8000
+
+Access in browser:
+
+http://localhost:8000/docs
+
+
+if we reboot it wont work so we use gunicorn
+pip install gunicorn
+gunicorn -w 4 -k uvicorn.workers.UvicornWorker sqlalchmy.main2:app --bind 0.0.0.0:8000
+- w 4 -> number of workers for loadbalancing
+- k -> worker type uvicorn.workers.UvicornWorker
+
+
+we cant run all gunicorn commad again and again so we create servie to run our app in background
+create a api.service in /etc/systemd/system/ and paste from gunicorn.service file
+ sudo systemctl daemon-reload
+ sudo systemctl start api
+ sudo systemctl status api
+● api.service - Demo FastAPI Application
+ curl http://127.0.0.1:8000/docs
+ http://192.168.241.131:8000/docs
+
+
+ sudo dhclient -v ens33 if ssh issue
+
+
+
+ Deploy on nginx
+
+ /etc/nginx/sites-available$ ls
+default
+sudo nano /etc/nginx/sites-available/default
+
+Make sure it looks like this:
+
+server {
+    listen 80;
+
+    location / {
+        proxy_pass http://127.0.0.1:8000;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+    }
+}
+sudo systemctl restart nginx
+ubuntu ip - http://192.168.241.131/docs
+
+for https buy doman name setup certificate from certbot
+https://certbot.eff.org/lets-encrypt/ubuntuxenial-nginx
+sudo apt install snapd
+sudo snap install --classic certbot
+sudo certbot --nginx
+enter email
+yes no yes
+domain name
+or ubuntu ip http://192.168.241.131/docs
+
+
+http://192.168.241.131/docs

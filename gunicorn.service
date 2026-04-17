@@ -1,0 +1,15 @@
+[Unit]
+Description= demo fastapi application
+After=network.target
+
+[service]
+User = anushka
+Group = anushka
+WorkingDirectory=/home/anushka/fastapi/src/
+Environment="PATH=/home/anushka/fastapi/venv/bin"
+EnvironmentFIle=/home/anushka/.env
+ExecStart=/home/anushka/fastapi/venv/bin/gunicorn -w 4 -k uvicorn.workers.UvicornWorker sqlalchmy.main2:app --bind 0.0.0.0:8000
+
+
+[Install]
+WantedBy=multi-user.target
